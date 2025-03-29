@@ -18,11 +18,14 @@ class Database:
             self.connection = None
             self.cursor = None
 
-    def fetch_data(self, query):
+    def fetch_data(self, query, values=None):
         """Exécute une requête SELECT et retourne les résultats."""
         if self.cursor:
             try:
-                self.cursor.execute(query)
+                if values:
+                    self.cursor.execute(query, values)
+                else:
+                    self.cursor.execute(query)
                 return self.cursor.fetchall()
             except mysql.connector.Error as err:
                 print(f"⚠️ Erreur lors de l'exécution de la requête : {err}")
