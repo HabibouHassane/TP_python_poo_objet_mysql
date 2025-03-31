@@ -5,6 +5,8 @@ class Contact:
         self.email = email
         self.telephone = telephone
 
+        
+
     def set_nom(self, nom):
         self.nom = nom
 

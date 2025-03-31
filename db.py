@@ -5,9 +5,9 @@ class Database:
         """Initialise la connexion à MySQL au lancement de l'application."""
         try:
             self.connection = mysql.connector.connect(
-                host="localhost",
-                user="root",
-                password="",
+                host="mysql_db",
+                user="vde",
+                password="vde",
                 database="contact"
             )
             if self.connection.is_connected():

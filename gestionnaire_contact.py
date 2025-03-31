@@ -10,7 +10,7 @@ class GestionnaireContact:
 
     def charger_contacts(self):
         """Charge les contacts depuis la base de données."""
-        query = "SELECT nom, prenom, email, telephone FROM contact"
+        query = "SELECT nom, prenom, email, telephone FROM contacts"
         contacts = self.db.fetch_data(query)
         return [Contact(nom, prenom, email, telephone) for nom, prenom, email, telephone in contacts]
 
@@ -21,7 +21,7 @@ class GestionnaireContact:
             return
 
         query = """
-            INSERT INTO contact (nom, prenom, email, telephone)
+            INSERT INTO contacts (nom, prenom, email, telephone)
             VALUES (%s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
             nom = VALUES(nom), prenom = VALUES(prenom), telephone = VALUES(telephone)
@@ -29,7 +29,7 @@ class GestionnaireContact:
         values = (contact.get_nom(), contact.get_prenom(), contact.get_email(), contact.get_telephone())
         self.db.execute_query(query, values)
         print("Contact ajouté avec succès !")
-        self.liste_contact.append(contact)
+        self.liste_contact = self.charger_contacts()
 
     def afficher_contact(self):
         """Affiche tous les contacts."""
@@ -51,7 +51,7 @@ class GestionnaireContact:
         contact = self.rechercher_contact(nom)
         if contact:
             updates = {}
-            fields = {'nom': 'nom', 'prenom': 'prenom', 'email': 'email', 'télephone': 'telephone'}
+            fields = {'nom': 'nom', 'prenom': 'prenom', 'email': 'email', 'telephone': 'telephone'}
             for field, db_field in fields.items():
                 value = input(f"{field} (laisser vide pour ne pas changer) : ")
                 if value:
@@ -61,7 +61,7 @@ class GestionnaireContact:
             if updates:
                 set_clause = ", ".join([f"{key} = %s" for key in updates.keys()])
                 query = f"""
-                    UPDATE contact
+                    UPDATE contacts
                     SET {set_clause}
                     WHERE email = %s OR telephone = %s
                 """
@@ -78,14 +78,14 @@ class GestionnaireContact:
 
     def supprimer_contact(self, telephone):
         """Supprime un contact de la base de données et de la liste locale."""
-        query = "SELECT 1 FROM contact WHERE telephone = %s"
+        query = "SELECT 1 FROM contacts WHERE telephone = %s"
         contact = self.db.fetch_data(query, (telephone,))
 
         if not contact:
             print(f"Aucun contact trouvé avec le téléphone {telephone}.")
             return
 
-        delete_query = "DELETE FROM contact WHERE telephone = %s"
+        delete_query = "DELETE FROM contacts WHERE telephone = %s"
         try:
             self.db.execute_query(delete_query, (telephone,))
             print(f"Le contact avec le téléphone {telephone} a été supprimé de la base de données.")
@@ -93,5 +93,5 @@ class GestionnaireContact:
             print(f"❌ Erreur lors de la suppression du contact : {e}")
             return
 
-        self.liste_contact = [c for c in self.liste_contact if c.get_telephone() != telephone]
+        self.liste_contact = self.charger_contacts()
         print(f"Le contact avec le téléphone {telephone} a été supprimé de la liste locale.")
