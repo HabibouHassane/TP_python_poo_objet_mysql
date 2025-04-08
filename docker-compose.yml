@@ -27,7 +27,7 @@ services:
       - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./script.sql:/docker-entrypoint-initdb.d/script.sql  # Lier le fichier script.sql
+      # - ./script.sql:/docker-entrypoint-initdb.d/script.sql  # Lier le fichier script.sql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
